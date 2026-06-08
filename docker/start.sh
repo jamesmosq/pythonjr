@@ -3,13 +3,19 @@ set -e
 
 echo "=== PythonJr — Iniciando ==="
 
+# ── Garantizar directorios de storage en runtime ───────────────────────────
+mkdir -p storage/framework/{sessions,views,cache,testing}
+mkdir -p storage/logs
+mkdir -p bootstrap/cache
+chmod -R 775 storage bootstrap/cache
+
 # ── Cachear configuración con los env vars de Railway (runtime) ────────────
 echo "Cacheando configuración..."
 php artisan config:clear
 php artisan config:cache
 php artisan route:cache
-php artisan view:cache
-php artisan event:cache
+php artisan view:cache   || echo "⚠️  view:cache falló (no crítico)"
+php artisan event:cache  || echo "⚠️  event:cache falló (no crítico)"
 
 # ── Migraciones (seguro de correr múltiples veces) ─────────────────────────
 echo "Corriendo migraciones..."
