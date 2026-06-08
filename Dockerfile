@@ -12,7 +12,7 @@ RUN curl -fsSL https://deb.nodesource.com/setup_22.x | bash - \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # ── Composer ───────────────────────────────────────────────────────────────
-COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+COPY --from=composer:2.8 /usr/bin/composer /usr/bin/composer
 
 WORKDIR /app
 
@@ -21,7 +21,6 @@ COPY composer.json composer.lock ./
 RUN composer install --optimize-autoloader --no-dev --no-scripts --no-interaction
 
 # ── Node deps raíz (Laravel Vite assets) ──────────────────────────────────
-# Sin package-lock.json en raíz → npm install en lugar de npm ci
 COPY package.json ./
 RUN npm install --include=dev
 
