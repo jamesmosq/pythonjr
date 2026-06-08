@@ -21,12 +21,13 @@ COPY composer.json composer.lock ./
 RUN composer install --optimize-autoloader --no-dev --no-scripts --no-interaction
 
 # ── Node deps raíz (Laravel Vite assets) ──────────────────────────────────
-COPY package.json package-lock.json* ./
-RUN npm ci --include=dev
+# Sin package-lock.json en raíz → npm install en lugar de npm ci
+COPY package.json ./
+RUN npm install --include=dev
 
 # ── Node deps React frontend ───────────────────────────────────────────────
 COPY frontend/package.json frontend/package-lock.json ./frontend/
-RUN npm --prefix frontend ci --include=dev
+RUN npm --prefix frontend ci
 
 # ── Copiar todo el source ──────────────────────────────────────────────────
 COPY . .
