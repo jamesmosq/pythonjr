@@ -38,7 +38,20 @@ class LogroSeeder extends Seeder
             ['slug' => 'fizzbuzz-hero', 'nombre' => 'FizzBuzz Hero', 'descripcion' => 'Completaste el clásico desafío FizzBuzz', 'icono' => '🦸', 'tipo' => 'especial', 'condicion_valor' => null],
             ['slug' => 'api-caller', 'nombre' => 'API Caller', 'descripcion' => 'Hiciste tu primera consulta a una API real', 'icono' => '🌐', 'tipo' => 'especial', 'condicion_valor' => null],
             ['slug' => 'game-creator', 'nombre' => 'Game Creator', 'descripcion' => 'Creaste tu primer juego visual', 'icono' => '🎮', 'tipo' => 'especial', 'condicion_valor' => null],
-            ['slug' => 'github-star', 'nombre' => 'GitHub Star', 'descripcion' => 'Subiste tu proyecto a GitHub', 'icono' => '⭐', 'tipo' => 'especial', 'condicion_valor' => null],
+            ['slug' => 'github-star',      'nombre' => 'GitHub Star',       'descripcion' => 'Subiste tu proyecto a GitHub',                      'icono' => '⭐', 'tipo' => 'especial',  'condicion_valor' => null],
+
+            // Git/GitHub
+            ['slug' => 'primer-commit',    'nombre' => '¡Primer commit!',   'descripcion' => 'Hiciste tu primer commit en Git',                     'icono' => '💾', 'tipo' => 'especial',  'condicion_valor' => null],
+            ['slug' => 'en-la-nube',       'nombre' => 'En la nube ☁️',     'descripcion' => 'Subiste tu primer repositorio a GitHub',              'icono' => '☁️', 'tipo' => 'especial',  'condicion_valor' => null],
+            ['slug' => 'control-total',    'nombre' => 'Control total',      'descripcion' => 'Completaste el módulo de Git y GitHub',               'icono' => '🌿', 'tipo' => 'progreso',  'condicion_valor' => null],
+            ['slug' => 'commit-epico',     'nombre' => 'Commit épico',       'descripcion' => '5 ejercicios de terminal perfectos',                  'icono' => '✍️', 'tipo' => 'perfeccion', 'condicion_valor' => 5],
+
+            // Hackathon
+            ['slug' => 'hackathon-rookie', 'nombre' => 'Hackathon Rookie',   'descripcion' => 'Completaste tu primer hackathon',                     'icono' => '🏁', 'tipo' => 'especial',  'condicion_valor' => null],
+            ['slug' => 'hackathon-pro',    'nombre' => 'Hackathon Pro',      'descripcion' => 'Completaste un hackathon con todos los ejercicios perfectos', 'icono' => '🏆', 'tipo' => 'especial', 'condicion_valor' => null],
+
+            // Meta semanal
+            ['slug' => 'meta-semanal',     'nombre' => 'Meta cumplida',      'descripcion' => 'Completaste la meta semanal de ejercicios',           'icono' => '🎯', 'tipo' => 'constancia', 'condicion_valor' => null],
         ];
 
         foreach ($logros as $data) {

@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\ConfiguracionPlataforma;
 use App\Models\Racha;
 use App\Models\User;
 
@@ -36,13 +37,15 @@ class RachaService
         if ($racha->dias_actuales >= 7 && ! $racha->racha_7d_cobrada) {
             $racha->racha_7d_cobrada = true;
             $racha->save();
-            return ['bono' => 20000, 'tipo' => 'racha_7d'];
+            $bono = ConfiguracionPlataforma::valor('bono_racha_7d', 20000);
+            return ['bono' => $bono, 'tipo' => 'racha_7d'];
         }
 
         if ($racha->dias_actuales >= 3 && ! $racha->racha_3d_cobrada) {
             $racha->racha_3d_cobrada = true;
             $racha->save();
-            return ['bono' => 8000, 'tipo' => 'racha_3d'];
+            $bono = ConfiguracionPlataforma::valor('bono_racha_3d', 8000);
+            return ['bono' => $bono, 'tipo' => 'racha_3d'];
         }
 
         return ['bono' => 0, 'tipo' => null];

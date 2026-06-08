@@ -55,8 +55,13 @@ class BilleteraService
             'velocidad_modulo' => '⚡ Bono de velocidad de módulo',
             'velocidad_nivel' => '⚡ Bono de velocidad de nivel',
             'desafio_dia' => '⭐ Desafío del día',
-            'bono_nivel' => 'Bono de nivel completado',
-            default => 'Recompensa',
+            'bono_nivel'          => 'Bono de nivel completado',
+            'bono_sorpresa'       => '🎁 ¡Bono sorpresa de papá!',
+            'meta_semanal'        => '🎯 ¡Meta semanal cumplida!',
+            'hackathon_base'      => '🏆 Hackathon completado',
+            'hackathon_velocidad' => '⚡ Hackathon completado con bono velocidad',
+            'hackathon_perfecto'  => '⭐ Hackathon perfecto',
+            default               => 'Recompensa',
         };
     }
 }

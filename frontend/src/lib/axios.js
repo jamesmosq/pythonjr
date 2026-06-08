@@ -27,7 +27,8 @@ export function resetCsrf() {
 api.interceptors.response.use(
   (res) => res,
   (err) => {
-    if (err.response?.status === 401 && !window.location.pathname.startsWith('/login')) {
+    const path = window.location.pathname
+    if (err.response?.status === 401 && !path.startsWith('/login') && !path.startsWith('/registro')) {
       window.location.href = '/login'
     }
     return Promise.reject(err)

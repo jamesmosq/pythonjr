@@ -13,8 +13,18 @@ class DatabaseSeeder extends Seeder
             ModuloSeeder::class,
             LeccionSeeder::class,
             EjercicioSeeder::class,
+            Modulo2Seeder::class,
+            Modulo3Seeder::class,
+            Modulo4Seeder::class,
+            Modulo5Seeder::class,
+            Modulo6Seeder::class,
+            Modulo7Seeder::class,
+            Modulo8Seeder::class,
+            Modulo9Seeder::class,
+            ModuloBDSeeder::class,
             LogroSeeder::class,
             ProgresoSeeder::class,
+            ConfiguracionSeeder::class,
         ]);
     }
 }

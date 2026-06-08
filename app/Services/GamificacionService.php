@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\ConfiguracionPlataforma;
 use App\Models\Ejercicio;
 use App\Models\EjercicioCompletado;
 use App\Models\Logro;
@@ -22,8 +23,9 @@ class GamificacionService
     {
         $recompensas = [];
 
-        // 1. Recompensa base del ejercicio
+        // 1. Recompensa base del ejercicio (con multiplicador si está activo)
         $monto = $esPerfecto ? $ejercicio->recompensa_perfecto : $ejercicio->recompensa_ejercicio;
+        $monto = $this->aplicarMultiplicador($monto);
         $this->billeteraService->acreditar($user, $monto, $esPerfecto ? 'perfecto' : 'ejercicio', $ejercicio->id, 'ejercicio');
         $recompensas[] = ['tipo' => $esPerfecto ? 'perfecto' : 'ejercicio', 'monto' => $monto];
 
@@ -60,7 +62,14 @@ class GamificacionService
             $this->desbloquearSiguienteModulo($user, $modulo);
         }
 
-        // 4. Verificar logros nuevos
+        // 4. Meta semanal
+        $metaBono = $this->verificarMetaSemanal($user);
+        if ($metaBono > 0) {
+            $this->billeteraService->acreditar($user, $metaBono, 'meta_semanal');
+            $recompensas[] = ['tipo' => 'meta_semanal', 'monto' => $metaBono];
+        }
+
+        // 5. Verificar logros nuevos
         $nuevosLogros = $this->verificarLogros($user);
 
         $user->load('billetera');
@@ -208,6 +217,40 @@ class GamificacionService
         }
 
         return $nuevos;
+    }
+
+    private function aplicarMultiplicador(int $monto): int
+    {
+        $activo = ConfiguracionPlataforma::valor('multiplicador_finde_activo', false);
+        if (! $activo) {
+            return $monto;
+        }
+        $factor = ConfiguracionPlataforma::valor('multiplicador_finde_factor', 2.0);
+        return (int) round($monto * $factor);
+    }
+
+    private function verificarMetaSemanal(User $user): int
+    {
+        $activa = ConfiguracionPlataforma::valor('meta_semanal_activa', false);
+        if (! $activa) {
+            return 0;
+        }
+
+        $meta = ConfiguracionPlataforma::valor('meta_semanal_ejercicios', 5);
+        $recompensa = ConfiguracionPlataforma::valor('meta_semanal_recompensa', 10000);
+
+        $inicioSemana = now()->startOfWeek();
+        $completadosEstaSemana = EjercicioCompletado::where('user_id', $user->id)
+            ->where('es_correcto', true)
+            ->where('completado_at', '>=', $inicioSemana)
+            ->count();
+
+        // Solo pagar una vez (exactamente al llegar a la meta)
+        if ($completadosEstaSemana === $meta) {
+            return $recompensa;
+        }
+
+        return 0;
     }
 
     private function nivelCompleto(User $user, int $nivel): bool

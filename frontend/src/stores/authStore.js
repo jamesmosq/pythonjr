@@ -14,7 +14,7 @@ export const useAuthStore = create(
           await initCsrf()
           const { data } = await api.post('/auth/login', { email, password })
           set({ user: data.data, loading: false })
-          return { ok: true }
+          return { ok: true, role: data.data.role }
         } catch (err) {
           set({ loading: false })
           return { ok: false, message: err.response?.data?.message ?? 'Error al iniciar sesión' }
@@ -37,6 +37,10 @@ export const useAuthStore = create(
         } catch {
           set({ user: null })
         }
+      },
+
+      updateProfile: (userData) => {
+        set({ user: { ...get().user, ...userData } })
       },
 
       isAdmin: () => get().user?.role === 'admin',

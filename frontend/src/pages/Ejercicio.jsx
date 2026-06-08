@@ -49,7 +49,13 @@ export default function Ejercicio() {
       }
 
       if (!data.data.es_correcto) {
-        setFeedback({ tipo: 'incorrecto', message: data.message, intento: data.data.intento })
+        setFeedback({
+          tipo: 'incorrecto',
+          message: data.message,
+          intento: data.data.intento,
+          sugerencia: data.meta?.sugerencia ?? null,
+          esIA: ejercicio.tipo === 'terminal_git',
+        })
         if (data.data.intento >= 2) setMostrarPista(true)
         return
       }
@@ -211,6 +217,31 @@ export default function Ejercicio() {
               </div>
             )}
 
+            {/* Terminal Git — calificado por IA */}
+            {ejercicio.tipo === 'terminal_git' && (
+              <div className="mb-4 space-y-3">
+                <div className="bg-[#0d1117] border border-[#30363d] rounded-xl overflow-hidden">
+                  <div className="flex items-center gap-1.5 px-3 py-2 border-b border-[#30363d] bg-[#161b22]">
+                    <div className="w-2.5 h-2.5 rounded-full bg-[#f85149]" />
+                    <div className="w-2.5 h-2.5 rounded-full bg-[#d29922]" />
+                    <div className="w-2.5 h-2.5 rounded-full bg-[#3fb950]" />
+                    <span className="text-[10px] text-[#484f58] ml-1 font-mono">bash — terminal</span>
+                    <span className="ml-auto text-[10px] text-[#a855f7] font-semibold">🤖 Claude revisa</span>
+                  </div>
+                  <textarea
+                    value={respuesta}
+                    onChange={(e) => setRespuesta(e.target.value)}
+                    placeholder={'$ git init\nInitialized empty Git repository...\n$ git add .\n$ git commit -m "mi primer commit"'}
+                    rows={7}
+                    className="w-full bg-[#0d1117] px-4 py-3 text-[#a3e635] placeholder-[#30363d] focus:outline-none font-mono text-sm resize-none leading-relaxed"
+                  />
+                </div>
+                <p className="text-xs text-[#484f58]">
+                  Ejecuta los comandos en tu terminal y pega toda la salida aquí. Claude revisará tu respuesta.
+                </p>
+              </div>
+            )}
+
             {/* Código libre / mini proyecto */}
             {(ejercicio.tipo === 'codigo_libre' || ejercicio.tipo === 'mini_proyecto') && (
               <div className="mb-4 space-y-3">
@@ -252,7 +283,17 @@ export default function Ejercicio() {
                     : 'bg-[#58a6ff]/10 border border-[#58a6ff]/30 text-[#58a6ff]'
                 }`}
               >
-                {feedback.message}
+                {feedback.esIA && (
+                  <div className="flex items-center gap-1 text-[10px] text-[#a855f7] mb-1.5 font-semibold">
+                    🤖 Evaluado por Claude
+                  </div>
+                )}
+                <p>{feedback.message}</p>
+                {feedback.sugerencia && (
+                  <div className="mt-2 pt-2 border-t border-[#f85149]/20 text-[11px] text-[#f85149]/70">
+                    💡 {feedback.sugerencia}
+                  </div>
+                )}
               </motion.div>
             )}
 
@@ -282,10 +323,15 @@ export default function Ejercicio() {
               disabled={enviando || (!respuesta.trim() && ejercicio.tipo !== 'codigo_libre' && ejercicio.tipo !== 'mini_proyecto')}
               className="w-full py-3 rounded-xl font-bold text-[#0d1117] bg-[#a3e635] hover:bg-[#84cc16] disabled:opacity-40 disabled:cursor-not-allowed transition-all hover:scale-[1.02] active:scale-[0.98]"
             >
-              {enviando ? 'Verificando...' :
-               ejercicio.tipo === 'codigo_libre' || ejercicio.tipo === 'mini_proyecto'
-                 ? '📤 Enviar al papá para revisar'
-                 : '✓ Verificar respuesta'}
+              {enviando
+                ? ejercicio.tipo === 'terminal_git'
+                  ? '🤖 Claude está revisando...'
+                  : 'Verificando...'
+                : ejercicio.tipo === 'codigo_libre' || ejercicio.tipo === 'mini_proyecto'
+                  ? '📤 Enviar al papá para revisar'
+                  : ejercicio.tipo === 'terminal_git'
+                  ? '🤖 Enviar a Claude para revisar'
+                  : '✓ Verificar respuesta'}
             </button>
           </>
         )}

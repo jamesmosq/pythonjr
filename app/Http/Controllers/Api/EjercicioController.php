@@ -7,13 +7,20 @@ use App\Http\Requests\Api\IntentarEjercicioRequest;
 use App\Http\Resources\EjercicioResource;
 use App\Models\Ejercicio;
 use App\Models\EjercicioCompletado;
+use App\Models\Hackathon;
+use App\Services\AnthropicGradingService;
 use App\Services\GamificacionService;
+use App\Services\HackathonService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class EjercicioController extends Controller
 {
-    public function __construct(private GamificacionService $gamificacion) {}
+    public function __construct(
+        private GamificacionService $gamificacion,
+        private AnthropicGradingService $anthropic,
+        private HackathonService $hackathonService,
+    ) {}
 
     public function show(Request $request, Ejercicio $ejercicio): JsonResponse
     {
@@ -48,9 +55,54 @@ class EjercicioController extends Controller
             'ejercicio_id' => $ejercicio->id,
         ]);
 
-        $registro->modulo_id = $ejercicio->modulo_id;
+        $hackathonId = $request->input('hackathon_id');
+        $hackathon   = $hackathonId ? Hackathon::find($hackathonId) : null;
+
+        $registro->modulo_id    = $ejercicio->modulo_id;
         $registro->respuesta_dada = $respuesta;
-        $registro->intento = ($registro->intento ?? 0) + 1;
+        $registro->intento      = ($registro->intento ?? 0) + 1;
+        $registro->hackathon_id = $hackathon?->id;
+
+        // terminal_git — calificado por IA
+        if ($ejercicio->tipo === 'terminal_git') {
+            $resultado = $this->anthropic->calificarEjercicio($user, $ejercicio, $respuesta);
+
+            $registro->es_correcto     = $resultado['correcto'];
+            $registro->es_perfecto     = $resultado['es_perfecto'];
+            $registro->feedback_ia     = $resultado['feedback'];
+            $registro->validado_por_ia = true;
+            $registro->completado_at   = now();
+            $registro->save();
+
+            if (! $resultado['correcto']) {
+                return response()->json([
+                    'success' => true,
+                    'data'    => ['es_correcto' => false, 'intento' => $registro->intento],
+                    'message' => $resultado['feedback'],
+                    'meta'    => ['sugerencia' => $resultado['sugerencia']],
+                ]);
+            }
+
+            $gamificacion = $this->gamificacion->procesarEjercicioCompletado($user, $ejercicio, $resultado['es_perfecto']);
+            $registro->recompensa_ganada = collect($gamificacion['recompensas'])->sum('monto');
+            $registro->save();
+
+            if ($hackathon?->estaActivo()) {
+                $this->hackathonService->registrarEjercicioCompletado($user, $hackathon, $resultado['es_perfecto']);
+            }
+
+            return response()->json([
+                'success' => true,
+                'data'    => ['es_correcto' => true, 'es_perfecto' => $resultado['es_perfecto'], 'intento' => $registro->intento],
+                'message' => $resultado['es_perfecto'] ? '¡PERFECTO! ⭐' : $resultado['feedback'],
+                'meta'    => [
+                    'recompensa_ganada' => collect($gamificacion['recompensas'])->sum('monto'),
+                    'recompensas'       => $gamificacion['recompensas'],
+                    'nuevos_logros'     => $gamificacion['nuevos_logros'],
+                    'billetera_total'   => $gamificacion['billetera_total'],
+                ],
+            ]);
+        }
 
         if ($ejercicio->esAutoVerificable()) {
             [$esCorrecto, $esPerfecto] = $this->verificarRespuesta($ejercicio, $respuesta, $registro->intento);
@@ -71,6 +123,10 @@ class EjercicioController extends Controller
             $gamificacion = $this->gamificacion->procesarEjercicioCompletado($user, $ejercicio, $esPerfecto);
             $registro->recompensa_ganada = collect($gamificacion['recompensas'])->sum('monto');
             $registro->save();
+
+            if ($hackathon?->estaActivo()) {
+                $this->hackathonService->registrarEjercicioCompletado($user, $hackathon, $esPerfecto);
+            }
 
             return response()->json([
                 'success' => true,

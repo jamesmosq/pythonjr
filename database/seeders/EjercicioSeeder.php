@@ -292,5 +292,128 @@ PY,
                 EjercicioOpcion::create(array_merge($opcion, ['ejercicio_id' => $ejercicio->id]));
             }
         }
+
+        $moduloGit = Modulo::where('slug', 'git-github')->first();
+        if (! $moduloGit) {
+            return;
+        }
+
+        $ejerciciosGit = [
+            // --- OBLIGATORIOS ---
+            [
+                'modulo_id'           => $moduloGit->id,
+                'orden'               => 1,
+                'tipo'                => 'quiz_opcion',
+                'titulo'              => '¿Qué hace git init?',
+                'enunciado'           => "Elige la respuesta correcta:\n\n¿Qué hace el comando `git init` en una carpeta?",
+                'solucion'            => null,
+                'respuesta_correcta'  => null,
+                'es_obligatorio'      => true,
+                'recompensa_ejercicio'=> 2500,
+                'recompensa_perfecto' => 4000,
+                'pista'               => 'Piensa en "inicializar" — significa empezar algo desde cero.',
+                'opciones' => [
+                    ['orden' => 1, 'texto' => 'a) Descarga Git en tu computador', 'es_correcta' => false],
+                    ['orden' => 2, 'texto' => 'b) Crea un repositorio Git en esa carpeta', 'es_correcta' => true],
+                    ['orden' => 3, 'texto' => 'c) Sube el código a GitHub', 'es_correcta' => false],
+                    ['orden' => 4, 'texto' => 'd) Borra todo el historial de commits', 'es_correcta' => false],
+                ],
+            ],
+            [
+                'modulo_id'           => $moduloGit->id,
+                'orden'               => 2,
+                'tipo'                => 'quiz_texto',
+                'titulo'              => 'El comando de la "foto"',
+                'enunciado'           => "Escribe el comando Git que se usa para **guardar los cambios** (tomar la \"foto\") con el mensaje `\"primer commit\"`.\n\nEscribe el comando completo, incluyendo el mensaje.",
+                'solucion'            => null,
+                'respuesta_correcta'  => 'git commit -m "primer commit"',
+                'es_obligatorio'      => true,
+                'recompensa_ejercicio'=> 2500,
+                'recompensa_perfecto' => 4000,
+                'pista'               => 'El comando empieza con "git commit" y tiene una opción "-m" para el mensaje.',
+            ],
+            [
+                'modulo_id'           => $moduloGit->id,
+                'orden'               => 3,
+                'tipo'                => 'terminal_git',
+                'titulo'              => 'Tu primer repositorio real',
+                'enunciado'           => "¡Es hora de hacerlo de verdad! 💪\n\n## Pasos a seguir en tu terminal:\n\n1. Crea una carpeta llamada `mi-repo-git`\n2. Entra a esa carpeta con `cd mi-repo-git`\n3. Inicializa Git con `git init`\n4. Crea un archivo `hola.py` con `print(\"Hola Git!\")` adentro\n5. Agrega el archivo: `git add hola.py`\n6. Haz tu primer commit: `git commit -m \"primer commit: agrego hola.py\"`\n7. Ejecuta `git log --oneline` para ver el historial\n\n**Pega aquí todo el output de tu terminal desde el paso 3 hasta el paso 7.**",
+                'solucion'            => "Criterios de evaluación:\n1. Debe aparecer output de 'git init' indicando repositorio inicializado\n2. Debe aparecer output de 'git add' o silencio (git add no imprime nada cuando funciona)\n3. Debe aparecer output de 'git commit' con el mensaje (cualquier mensaje descriptivo es aceptable, no solo 'primer commit')\n4. El git log --oneline debe mostrar al menos 1 commit\n5. El mensaje del commit debe ser descriptivo (no solo 'a', 'aaa', 'test' o caracteres aleatorios)\nes_perfecto si: el mensaje del commit es descriptivo Y el flujo está completo Y no hay errores",
+                'respuesta_correcta'  => null,
+                'es_obligatorio'      => true,
+                'recompensa_ejercicio'=> 5000,
+                'recompensa_perfecto' => 8000,
+                'pista'               => 'Asegúrate de estar dentro de la carpeta antes de hacer git init. Usa cd para entrar.',
+            ],
+            [
+                'modulo_id'           => $moduloGit->id,
+                'orden'               => 4,
+                'tipo'                => 'quiz_opcion',
+                'titulo'              => '¿Qué es GitHub?',
+                'enunciado'           => "Elige la mejor descripción de GitHub:",
+                'solucion'            => null,
+                'respuesta_correcta'  => null,
+                'es_obligatorio'      => true,
+                'recompensa_ejercicio'=> 2500,
+                'recompensa_perfecto' => 4000,
+                'pista'               => 'GitHub es el lugar donde vive tu código en internet.',
+                'opciones' => [
+                    ['orden' => 1, 'texto' => 'a) Un editor de código como VS Code', 'es_correcta' => false],
+                    ['orden' => 2, 'texto' => 'b) Una red social solo para diseñadores', 'es_correcta' => false],
+                    ['orden' => 3, 'texto' => 'c) Un servidor en internet donde guardas repositorios Git', 'es_correcta' => true],
+                    ['orden' => 4, 'texto' => 'd) El nombre del creador de Git', 'es_correcta' => false],
+                ],
+            ],
+            [
+                'modulo_id'           => $moduloGit->id,
+                'orden'               => 5,
+                'tipo'                => 'terminal_git',
+                'titulo'              => 'El historial de tu código',
+                'enunciado'           => "Vamos a ver cómo se ve el historial después de varios commits. 📜\n\n## Pasos:\n\n1. En tu carpeta `mi-repo-git` (la del ejercicio anterior)\n2. Modifica `hola.py` — agrega una segunda línea: `print(\"¡Git es increíble!\")`\n3. Haz un segundo commit: `git add hola.py` y luego `git commit -m \"agrego segunda impresión\"`\n4. Ejecuta `git log --oneline`\n\n**Pega el output de git log --oneline. Deben aparecer 2 commits.**",
+                'solucion'            => "Criterios:\n1. El output debe mostrar 2 líneas (2 commits)\n2. Cada línea tiene un hash corto (7 caracteres) seguido del mensaje del commit\n3. Los mensajes deben ser diferentes entre sí\n4. El commit más reciente debe aparecer arriba\nes_perfecto si: hay exactamente 2 commits con mensajes descriptivos diferentes",
+                'respuesta_correcta'  => null,
+                'es_obligatorio'      => false,
+                'recompensa_ejercicio'=> 4000,
+                'recompensa_perfecto' => 6000,
+                'pista'               => 'git log --oneline muestra una línea por commit, el más reciente arriba.',
+            ],
+            [
+                'modulo_id'           => $moduloGit->id,
+                'orden'               => 6,
+                'tipo'                => 'terminal_git',
+                'titulo'              => '¡Sube tu código a GitHub!',
+                'enunciado'           => "¡El momento más emocionante! 🚀 Vas a subir tu código a GitHub por primera vez.\n\n## Pasos:\n\n1. Entra a **github.com** y crea una cuenta si no tienes\n2. Crea un repositorio nuevo llamado `mi-repo-git` (sin README)\n3. En tu terminal, conecta tu repo local con GitHub:\n```bash\ngit remote add origin https://github.com/TU_USUARIO/mi-repo-git.git\ngit push -u origin main\n```\n4. Ejecuta `git remote -v` para verificar la conexión\n\n**Pega el output de `git remote -v` y `git push` (o los mensajes que aparecieron).**",
+                'solucion'            => "Criterios:\n1. El output de git remote -v debe mostrar la URL de GitHub (origin fetch y origin push)\n2. La URL debe contener 'github.com'\n3. Debe haber evidencia del push (puede ser el output de git push o el mensaje de éxito)\n4. No se requiere que el usuario ya tenga cuenta — si describe que creó la cuenta y configuró el remote, eso es válido\nes_perfecto si: el remote apunta a GitHub, el push fue exitoso y la URL tiene el nombre del usuario",
+                'respuesta_correcta'  => null,
+                'es_obligatorio'      => false,
+                'recompensa_ejercicio'=> 5000,
+                'recompensa_perfecto' => 8000,
+                'pista'               => 'Reemplaza TU_USUARIO con tu nombre de usuario de GitHub. Si no tienes cuenta aún, créala primero en github.com.',
+            ],
+            [
+                'modulo_id'           => $moduloGit->id,
+                'orden'               => 7,
+                'tipo'                => 'mini_proyecto',
+                'titulo'              => 'Tu portafolio de Python en GitHub 🌐',
+                'enunciado'           => "## Proyecto final del módulo\n\nCrea un repositorio en GitHub llamado `pythonjr-ejercicios` con tus mejores programas Python.\n\n## Requisitos:\n\n1. Crea el repo local, agrega al menos 2 archivos `.py` de tus módulos anteriores\n2. Agrega un `README.md` con:\n   - Tu nombre (o apodo)\n   - Una descripción: \"Mis ejercicios de Python de PythonJr\"\n   - Lista de los programas incluidos\n3. Sube todo a GitHub con commits descriptivos\n4. Copia aquí la URL de tu repositorio (ej: `github.com/tu_usuario/pythonjr-ejercicios`)\n\n**Pega la URL de tu repositorio en GitHub.**",
+                'solucion'            => null,
+                'respuesta_correcta'  => null,
+                'es_obligatorio'      => false,
+                'recompensa_ejercicio'=> 8000,
+                'recompensa_perfecto' => 12000,
+                'pista'               => 'Puedes copiar los archivos .py de tus ejercicios anteriores a la nueva carpeta.',
+            ],
+        ];
+
+        foreach ($ejerciciosGit as $data) {
+            $opciones = $data['opciones'] ?? [];
+            unset($data['opciones']);
+
+            $ejercicio = Ejercicio::create($data);
+
+            foreach ($opciones as $opcion) {
+                EjercicioOpcion::create(array_merge($opcion, ['ejercicio_id' => $ejercicio->id]));
+            }
+        }
     }
 }

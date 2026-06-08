@@ -20,26 +20,39 @@ class UserSeeder extends Seeder
             'avatar' => '👨‍💻',
         ]);
 
-        $estudiante = User::create([
-            'name' => 'Santiago',
-            'email' => 'santiago@pythonjr.com',
-            'password' => Hash::make('python123'),
-            'role' => 'estudiante',
-            'avatar' => '🧑‍🎓',
-        ]);
+        $estudiantes = [
+            [
+                'name' => 'Santiago',
+                'email' => 'santiago@pythonjr.com',
+                'password' => Hash::make('python123'),
+                'role' => 'estudiante',
+                'avatar' => '🧑‍🎓',
+            ],
+            [
+                'name' => 'Nikolas',
+                'email' => 'nikolasmosqr@gmail.com',
+                'password' => Hash::make('python123'),
+                'role' => 'estudiante',
+                'avatar' => '🧑‍🎓',
+            ],
+        ];
 
-        Billetera::create([
-            'user_id' => $estudiante->id,
-            'saldo_total' => 0,
-            'saldo_pendiente' => 0,
-            'saldo_pagado' => 0,
-        ]);
+        foreach ($estudiantes as $datos) {
+            $est = User::create($datos);
 
-        Racha::create([
-            'user_id' => $estudiante->id,
-            'dias_actuales' => 0,
-            'dias_maximos' => 0,
-            'ultima_actividad_at' => null,
-        ]);
+            Billetera::create([
+                'user_id' => $est->id,
+                'saldo_total' => 0,
+                'saldo_pendiente' => 0,
+                'saldo_pagado' => 0,
+            ]);
+
+            Racha::create([
+                'user_id' => $est->id,
+                'dias_actuales' => 0,
+                'dias_maximos' => 0,
+                'ultima_actividad_at' => null,
+            ]);
+        }
     }
 }

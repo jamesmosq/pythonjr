@@ -402,5 +402,394 @@ MD,
         foreach ($lecciones as $data) {
             Leccion::create($data);
         }
+
+        $moduloGit = Modulo::where('slug', 'git-github')->first();
+        if (! $moduloGit) {
+            return;
+        }
+
+        $leccionesGit = [
+            [
+                'modulo_id' => $moduloGit->id,
+                'orden' => 1,
+                'tipo' => 'teoria',
+                'titulo' => '¿Por qué guardar el tiempo?',
+                'contenido' => <<<'MD'
+# ¿Por qué guardar el tiempo? ⏳
+
+Imagina que estás construyendo el castillo de Minecraft de tu vida. Llevas 5 horas trabajando y de repente... **¡lo arruinas todo sin querer!** 😱
+
+Si el juego no tuviera guardado automático, perderías TODO.
+
+Con tu código pasa lo mismo. Cuando escribes un programa, puedes:
+- Borrar algo que funcionaba sin querer
+- Probar algo nuevo y arruinar lo anterior
+- Querer volver a una versión de hace 3 días
+
+## Git es tu máquina del tiempo 🕰️
+
+**Git** es un programa que guarda "fotos" de tu código en cualquier momento. Cada foto se llama **commit**.
+
+Así funciona:
+
+```
+Versión 1   →   Versión 2   →   Versión 3
+(commit 1)     (commit 2)     (commit 3)
+   📸              📸              📸
+```
+
+Si algo sale mal en la versión 3, puedes volver a la versión 1 o 2. **¡El tiempo es tuyo!**
+
+## ¿Y GitHub?
+
+**GitHub** es como Google Drive pero para código. Subes tus commits ahí y:
+- Tu código está seguro en internet (aunque se rompa tu PC)
+- Cualquier persona en el mundo puede ver tu trabajo
+- Es lo que usan TODOS los programadores profesionales
+
+> 💡 Dato curioso: Más de **100 millones de programadores** usan GitHub. Cuando termines este módulo, ¡serás uno de ellos!
+MD,
+            ],
+            [
+                'modulo_id' => $moduloGit->id,
+                'orden' => 2,
+                'tipo' => 'teoria',
+                'titulo' => 'Instalación y tu primera configuración',
+                'contenido' => <<<'MD'
+# Instalación y configuración ⚙️
+
+## 1. Instalar Git
+
+Descarga Git desde **git-scm.com** → "Download for Windows".
+
+Instala con todas las opciones por defecto. Cuando termine, abre la terminal (CMD o PowerShell) y escribe:
+
+```bash
+git --version
+```
+
+Si ves algo como `git version 2.44.0`, ¡listo! ✅
+
+## 2. Decirle a Git quién eres
+
+Git necesita saber tu nombre y correo para firmar tus commits. Escribe esto en la terminal (cambia los datos por los tuyos):
+
+```bash
+git config --global user.name "Tu Nombre"
+git config --global user.email "tucorreo@gmail.com"
+```
+
+Verifica que quedó bien:
+
+```bash
+git config --global user.name
+git config --global user.email
+```
+
+## 3. El flujo básico de Git
+
+Todo en Git sigue este ciclo:
+
+```
+1. Trabajas en tu código
+       ↓
+2. git add (dices qué archivos guardar)
+       ↓
+3. git commit (tomas la "foto")
+       ↓
+4. git push (subes a GitHub)
+```
+
+¡En las siguientes lecciones harás cada uno de estos pasos!
+MD,
+            ],
+            [
+                'modulo_id' => $moduloGit->id,
+                'orden' => 3,
+                'tipo' => 'ejemplo_codigo',
+                'titulo' => 'Tu primer repositorio',
+                'contenido' => <<<'MD'
+# Tu primer repositorio 📁
+
+Un **repositorio** (o "repo") es una carpeta especial donde Git guarda todo el historial de tu código.
+
+## Crear un repositorio desde cero
+
+```bash
+# 1. Crea una carpeta para tu proyecto
+mkdir mi-primer-repo
+cd mi-primer-repo
+
+# 2. Inicializa Git en esa carpeta
+git init
+```
+
+Verás algo como: `Initialized empty Git repository in .../mi-primer-repo/.git/`
+
+¡Git ya está vigilando esa carpeta! 👀
+
+## Ver el estado de tus archivos
+
+```bash
+git status
+```
+
+Este comando es tu mejor amigo. Te dice:
+- Qué archivos cambiaron
+- Qué archivos están listos para guardar
+- Qué archivos son nuevos
+
+## Tu primer commit
+
+```bash
+# 1. Crea un archivo
+echo "# Mi primer repo con Git" > README.md
+
+# 2. Dile a Git que quieres guardar ese archivo
+git add README.md
+
+# 3. Toma la "foto" (commit)
+git commit -m "primer commit: agrego README"
+```
+
+La parte `-m "..."` es el **mensaje del commit**. Es como el nombre de la foto.
+
+> 💡 **Consejo pro**: Los buenos mensajes de commit explican QUÉ hiciste, no cómo. Ejemplo:
+> - ❌ `git commit -m "cambios"`
+> - ✅ `git commit -m "agrego función para calcular el área del círculo"`
+MD,
+            ],
+            [
+                'modulo_id' => $moduloGit->id,
+                'orden' => 4,
+                'tipo' => 'teoria',
+                'titulo' => 'Viajando por el historial',
+                'contenido' => <<<'MD'
+# Viajando por el historial 🗺️
+
+Una vez que tienes varios commits, puedes explorar el historial de tu código.
+
+## Ver todos los commits
+
+```bash
+git log
+```
+
+Muestra algo como:
+```
+commit a3f2c1d (HEAD -> main)
+Author: Tu Nombre <tucorreo@gmail.com>
+Date:   Sat Jun 7 2026
+
+    agrego función suma
+
+commit b1e9f3a
+Author: Tu Nombre <tucorreo@gmail.com>
+Date:   Fri Jun 6 2026
+
+    primer commit: agrego README
+```
+
+## Versión resumida (la más útil)
+
+```bash
+git log --oneline
+```
+
+Muestra:
+```
+a3f2c1d agrego función suma
+b1e9f3a primer commit: agrego README
+```
+
+## Ver qué cambió entre versiones
+
+```bash
+git diff
+```
+
+Muestra las líneas que agregaste (verde `+`) y eliminaste (rojo `-`).
+
+## Tip: ¿Cuántos commits hacer?
+
+Haz un commit cada vez que termines algo pequeño y que funcione. Piénsalo como guardar en un videojuego: **guarda seguido** para no perder progreso.
+MD,
+            ],
+            [
+                'modulo_id' => $moduloGit->id,
+                'orden' => 5,
+                'tipo' => 'ejemplo_codigo',
+                'titulo' => 'GitHub — tu código en el universo',
+                'contenido' => <<<'MD'
+# GitHub — tu código en el universo 🌌
+
+## Crear tu cuenta
+
+Ve a **github.com** y crea una cuenta gratuita. El nombre de usuario es importante — ¡es tu identidad como programador!
+
+## Conectar tu repo local con GitHub
+
+```bash
+# 1. Agrega GitHub como destino remoto
+git remote add origin https://github.com/TU_USUARIO/mi-primer-repo.git
+
+# 2. Sube tu código por primera vez
+git push -u origin main
+```
+
+Después del primer push, solo necesitas:
+```bash
+git push
+```
+
+## El ciclo completo del día a día
+
+Así trabajan los programadores todos los días:
+
+```bash
+# 1. Escribir código
+# 2. Ver qué cambió
+git status
+
+# 3. Agregar los archivos que quieres guardar
+git add .          # agrega TODOS los archivos
+git add archivo.py # agrega solo uno
+
+# 4. Commit con mensaje descriptivo
+git commit -m "agrego función para validar edad"
+
+# 5. Subir a GitHub
+git push
+```
+
+## Ver tu perfil de GitHub
+
+Entra a `github.com/TU_USUARIO` — ahí aparecen todos tus repositorios públicos. ¡Es tu portafolio de programador!
+
+> 🌟 Los programadores usan su GitHub como tarjeta de presentación cuando buscan trabajo.
+MD,
+            ],
+            [
+                'modulo_id' => $moduloGit->id,
+                'orden' => 6,
+                'tipo' => 'teoria',
+                'titulo' => 'Ramas — universos paralelos',
+                'contenido' => <<<'MD'
+# Ramas — universos paralelos 🌿
+
+Imagina que puedes crear una copia de tu código para probar algo nuevo, sin arriesgar lo que ya funciona. Eso son las **ramas** (branches).
+
+## La rama principal: `main`
+
+Por defecto, todo tu trabajo está en la rama `main`. Es la versión "oficial" de tu código.
+
+## Crear una rama nueva
+
+```bash
+git branch nueva-funcion
+git checkout nueva-funcion
+# O en un solo comando:
+git checkout -b nueva-funcion
+```
+
+## Trabajar en la rama y volver a main
+
+```bash
+# Estás en "nueva-funcion", haces cambios y commits
+git add .
+git commit -m "experimento: agrego modo oscuro"
+
+# Si funcionó, vuelves a main y fusionas
+git checkout main
+git merge nueva-funcion
+```
+
+## Ver todas las ramas
+
+```bash
+git branch
+```
+
+La rama activa tiene un `*` al lado.
+
+## ¿Cuándo usar ramas?
+
+Por ahora, para proyectos personales pequeños, una sola rama `main` está bien. Las ramas se usan mucho cuando hay varios programadores trabajando en el mismo proyecto al mismo tiempo.
+
+> 💡 Para este módulo no es obligatorio usar ramas — es un concepto que conocerás en proyectos más grandes.
+MD,
+            ],
+            [
+                'modulo_id' => $moduloGit->id,
+                'orden' => 7,
+                'tipo' => 'ejemplo_codigo',
+                'titulo' => 'Proyecto: tu portafolio en GitHub',
+                'contenido' => <<<'MD'
+# Tu portafolio público 🌐
+
+¡Este es el reto final del módulo! Vas a subir todos tus ejercicios de Python a GitHub para tener tu primer portafolio público.
+
+## Qué vas a hacer
+
+```bash
+# 1. Crea una carpeta llamada "pythonjr-ejercicios"
+mkdir pythonjr-ejercicios
+cd pythonjr-ejercicios
+git init
+
+# 2. Copia tus mejores programas de Python aquí
+# (Los que hiciste en los módulos anteriores)
+
+# 3. Crea un README.md presentando tu portafolio
+echo "# Mis ejercicios de Python 🐍" > README.md
+echo "Soy estudiante de Python. Aquí están mis programas." >> README.md
+
+# 4. Primer commit
+git add .
+git commit -m "inicio: agrego mis ejercicios de Python"
+
+# 5. Crea el repositorio en GitHub con el mismo nombre
+# Ve a github.com → New repository → "pythonjr-ejercicios"
+
+# 6. Conecta y sube
+git remote add origin https://github.com/TU_USUARIO/pythonjr-ejercicios.git
+git push -u origin main
+```
+
+## Resultado
+
+Tendrás una URL así:
+```
+github.com/TU_USUARIO/pythonjr-ejercicios
+```
+
+¡Cualquier persona en el mundo puede ver tu código! 🌍
+
+## Agrega un README bonito
+
+Un buen README tiene:
+- Tu nombre y una presentación corta
+- Lista de los programas que incluiste
+- Qué aprendiste en cada uno
+
+```markdown
+# Mis ejercicios de Python 🐍
+
+Hola, soy [Tu Nombre], estudiante de programación.
+
+## Programas incluidos
+- `calculadora.py` - suma, resta, multiplicación y división
+- `adivina_numero.py` - juego para adivinar un número secreto
+- `conversor.py` - convierte temperaturas entre Celsius y Fahrenheit
+```
+
+¡Esto es lo que ven los programadores profesionales cuando buscan trabajo!
+MD,
+            ],
+        ];
+
+        foreach ($leccionesGit as $data) {
+            Leccion::create($data);
+        }
     }
 }

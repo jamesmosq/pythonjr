@@ -1,6 +1,6 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { motion } from 'framer-motion'
+import { motion, AnimatePresence } from 'framer-motion'
 import { useProgresoStore } from '@/stores/progresoStore'
 import { useBilleteraStore } from '@/stores/billeteraStore'
 import { useAuthStore } from '@/stores/authStore'
@@ -52,11 +52,15 @@ export default function Dashboard() {
   const user = useAuthStore((s) => s.user)
   const { dashboard, loading, fetchDashboard, modulos, fetchModulos } = useProgresoStore()
   const fetchBilletera = useBilleteraStore((s) => s.fetch)
+  const [hackathon, setHackathon] = useState(null)
 
   useEffect(() => {
     fetchDashboard()
     fetchModulos()
     fetchBilletera()
+    api.get('/hackathon/activo').then(({ data }) => {
+      if (data.data && !data.data.finalizado) setHackathon(data.data)
+    }).catch(() => {})
   }, [])
 
   if (loading && !dashboard) {
@@ -113,6 +117,49 @@ export default function Dashboard() {
           </div>
         </div>
       </motion.div>
+
+      {/* Banner Hackathon activo */}
+      <AnimatePresence>
+        {hackathon && (
+          <motion.div
+            className="bg-gradient-to-r from-[#facc15]/20 to-[#f59e0b]/10 border-2 border-[#facc15]/60 rounded-2xl p-5"
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.95 }}
+          >
+            <div className="flex items-center justify-between">
+              <div>
+                <div className="flex items-center gap-2 text-[#facc15] text-sm font-black mb-1">
+                  <span className="animate-bounce">🏆</span> HACKATHON ACTIVO
+                </div>
+                <div className="font-bold text-[#e6edf3] text-lg">{hackathon.nombre}</div>
+                <div className="text-sm text-[#8b949e] mt-0.5">
+                  {hackathon.completados}/{hackathon.total} ejercicios •{' '}
+                  <span className="text-[#a3e635] font-bold">
+                    +${hackathon.recompensa_base.toLocaleString('es-CO')}
+                  </span>
+                </div>
+              </div>
+              <button
+                onClick={() => navigate('/hackathon')}
+                className="bg-[#facc15] text-[#0d1117] font-black px-5 py-2.5 rounded-xl hover:bg-yellow-300 transition-all hover:scale-105 active:scale-95"
+              >
+                ¡Entrar! →
+              </button>
+            </div>
+            {hackathon.total > 0 && (
+              <div className="mt-3 h-2 bg-[#21262d] rounded-full overflow-hidden">
+                <motion.div
+                  className="h-full bg-gradient-to-r from-[#facc15] to-[#f59e0b] rounded-full"
+                  initial={{ width: 0 }}
+                  animate={{ width: `${(hackathon.completados / hackathon.total) * 100}%` }}
+                  transition={{ duration: 0.8 }}
+                />
+              </div>
+            )}
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Desafío del día */}
       {desafio && !desafio.completado && (
