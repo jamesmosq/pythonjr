@@ -22,6 +22,15 @@ class ModuloController extends Controller
             ->get()
             ->keyBy('modulo_id');
 
+        // Usuario sin ningún progreso → desbloquear el primer módulo
+        if ($progresos->isEmpty() && $modulos->isNotEmpty()) {
+            $primer = ProgresoModulo::firstOrCreate(
+                ['user_id' => $user->id, 'modulo_id' => $modulos->first()->id],
+                ['estado' => 'disponible']
+            );
+            $progresos->put($modulos->first()->id, $primer);
+        }
+
         $data = $modulos->map(function (Modulo $modulo) use ($progresos) {
             $progreso = $progresos->get($modulo->id);
             $modulo->estado_usuario = $progreso?->estado ?? 'bloqueado';

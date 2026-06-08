@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Billetera;
+use App\Models\Modulo;
+use App\Models\ProgresoModulo;
 use App\Models\Racha;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
@@ -50,6 +52,16 @@ class AuthController extends Controller
             'dias_maximos'       => 0,
             'ultima_actividad_at'=> null,
         ]);
+
+        // Desbloquear el primer módulo para que el estudiante pueda empezar
+        $primerModulo = Modulo::where('activo', true)->orderBy('nivel')->orderBy('orden')->first();
+        if ($primerModulo) {
+            ProgresoModulo::create([
+                'user_id'   => $user->id,
+                'modulo_id' => $primerModulo->id,
+                'estado'    => 'disponible',
+            ]);
+        }
 
         Auth::login($user);
 
