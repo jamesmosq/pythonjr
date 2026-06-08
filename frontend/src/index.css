@@ -1,0 +1,68 @@
+@import "tailwindcss";
+
+@theme {
+  --color-bg-base: #0d1117;
+  --color-bg-card: #161b22;
+  --color-bg-elevated: #21262d;
+  --color-bg-hover: #30363d;
+  --color-border: #30363d;
+  --color-lime-400: #a3e635;
+  --color-lime-500: #84cc16;
+  --color-purple-400: #c084fc;
+  --color-purple-500: #a855f7;
+  --color-yellow-400: #facc15;
+  --color-text-primary: #e6edf3;
+  --color-text-secondary: #8b949e;
+  --color-text-muted: #484f58;
+  --color-success: #3fb950;
+  --color-error: #f85149;
+  --font-sans: 'Inter', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html, body, #root { height: 100%; margin: 0; padding: 0; }
+
+body {
+  background-color: #0d1117;
+  color: #e6edf3;
+  font-family: 'Inter', system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: #0d1117; }
+::-webkit-scrollbar-thumb { background: #30363d; border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #484f58; }
+
+/* Markdown */
+.md h1 { font-size: 1.4rem; font-weight: 700; margin: 1.25rem 0 0.5rem; color: #e6edf3; }
+.md h2 { font-size: 1.15rem; font-weight: 600; margin: 1rem 0 0.4rem; color: #e6edf3; }
+.md h3 { font-size: 1rem; font-weight: 600; margin: 0.75rem 0 0.3rem; color: #8b949e; }
+.md p  { margin: 0.6rem 0; line-height: 1.7; color: #c9d1d9; }
+.md ul, .md ol { padding-left: 1.4rem; margin: 0.4rem 0; color: #c9d1d9; }
+.md li { margin: 0.2rem 0; line-height: 1.6; }
+.md strong { color: #e6edf3; font-weight: 600; }
+.md em { color: #a3e635; }
+.md blockquote { border-left: 3px solid #a855f7; padding-left: 1rem; margin: 0.5rem 0; color: #8b949e; }
+.md code:not(pre code) {
+  background: #21262d; color: #a3e635;
+  padding: 0.1em 0.35em; border-radius: 4px;
+  font-family: 'JetBrains Mono', monospace; font-size: 0.83em;
+}
+.md pre {
+  background: #0d1117; border: 1px solid #30363d; border-radius: 8px;
+  padding: 1rem; overflow-x: auto; margin: 0.75rem 0;
+}
+.md pre code { color: #e6edf3; font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; line-height: 1.6; }
+
+@keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-5px)} }
+.animate-float { animation: float 3s ease-in-out infinite; }
+
+@keyframes shimmer { 0%{background-position:-200% 0} 100%{background-position:200% 0} }
+.animate-shimmer {
+  background: linear-gradient(90deg, #21262d 25%, #30363d 50%, #21262d 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}

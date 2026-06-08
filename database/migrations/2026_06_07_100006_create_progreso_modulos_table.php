@@ -1,0 +1,28 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::create('progreso_modulos', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('user_id')->constrained('users')->cascadeOnDelete();
+            $table->foreignId('modulo_id')->constrained('modulos')->cascadeOnDelete();
+            // 'bloqueado' | 'disponible' | 'en_progreso' | 'completado'
+            $table->string('estado', 20)->default('bloqueado');
+            $table->timestampTz('iniciado_at')->nullable();
+            $table->timestampTz('completado_at')->nullable();
+            $table->boolean('bono_velocidad_aplicado')->default(false);
+            $table->unique(['user_id', 'modulo_id']);
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('progreso_modulos');
+    }
+};
