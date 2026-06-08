@@ -34,10 +34,15 @@ COPY . .
 # ── Build Laravel assets (CSS/JS para Blade, si aplica) ───────────────────
 RUN npm run build
 
-# ── Build React SPA → frontend/dist/ → public/spa/ ────────────────────────
+# ── Build React SPA ──────────────────────────────────────────────────────────
+# index.html → public/spa/index.html  (Laravel catch-all lo sirve)
+# assets/    → public/assets/         (Caddy los sirve como static files)
+# favicon    → public/favicon.svg     (referencia absoluta /favicon.svg)
 RUN npm --prefix frontend run build \
-    && mkdir -p public/spa \
-    && cp -r frontend/dist/. public/spa/
+    && mkdir -p public/spa public/assets \
+    && cp frontend/dist/index.html public/spa/index.html \
+    && cp -r frontend/dist/assets/. public/assets/ \
+    && (cp frontend/dist/favicon.svg public/favicon.svg 2>/dev/null || true)
 
 # ── Permisos de storage ────────────────────────────────────────────────────
 RUN mkdir -p storage/framework/{sessions,views,cache,testing} storage/logs bootstrap/cache \
