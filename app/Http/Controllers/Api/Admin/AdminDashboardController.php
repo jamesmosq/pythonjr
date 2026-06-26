@@ -14,17 +14,20 @@ use Illuminate\Support\Carbon;
 
 class AdminDashboardController extends Controller
 {
-    public function estudiantes(): JsonResponse
+    public function estudiantes(Request $request): JsonResponse
     {
-        $lista = User::where('role', 'estudiante')
-            ->orderBy('name')
-            ->get()
-            ->map(fn ($u) => [
-                'id'     => $u->id,
-                'nombre' => $u->name,
-                'email'  => $u->email,
-                'avatar' => $u->avatar,
-            ]);
+        $query = User::where('role', 'estudiante')->orderBy('name');
+
+        if ($request->user()->role === 'admin') {
+            $query->where('parent_id', $request->user()->id);
+        }
+
+        $lista = $query->get()->map(fn ($u) => [
+            'id'     => $u->id,
+            'nombre' => $u->name,
+            'email'  => $u->email,
+            'avatar' => $u->avatar,
+        ]);
 
         return response()->json(['success' => true, 'data' => $lista]);
     }
@@ -32,9 +35,15 @@ class AdminDashboardController extends Controller
     public function index(Request $request): JsonResponse
     {
         $estudianteId = $request->query('estudiante_id');
-        $estudiante   = $estudianteId
-            ? User::where('role', 'estudiante')->find($estudianteId)
-            : User::where('role', 'estudiante')->first();
+
+        $query = User::where('role', 'estudiante');
+        if ($request->user()->role === 'admin') {
+            $query->where('parent_id', $request->user()->id);
+        }
+
+        $estudiante = $estudianteId
+            ? $query->find($estudianteId)
+            : $query->first();
 
         if (! $estudiante) {
             return response()->json(['success' => true, 'data' => null]);

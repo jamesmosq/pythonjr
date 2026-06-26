@@ -13,27 +13,30 @@ class UserSeeder extends Seeder
     public function run(): void
     {
         $admin = User::create([
-            'name' => 'Papá',
-            'email' => 'admin@pythonjr.com',
-            'password' => Hash::make('admin123'),
-            'role' => 'admin',
-            'avatar' => '👨‍💻',
+            'name'      => 'Papá',
+            'email'     => 'admin@pythonjr.com',
+            'password'  => Hash::make('admin123'),
+            'role'      => 'superadmin',
+            'avatar'    => '👨‍💻',
+            'parent_id' => null,
         ]);
 
         $estudiantes = [
             [
-                'name' => 'Santiago',
-                'email' => 'santiago@pythonjr.com',
-                'password' => Hash::make('python123'),
-                'role' => 'estudiante',
-                'avatar' => '🧑‍🎓',
+                'name'      => 'Santiago',
+                'email'     => 'santiago@pythonjr.com',
+                'password'  => Hash::make('python123'),
+                'role'      => 'estudiante',
+                'avatar'    => '🧑‍🎓',
+                'parent_id' => $admin->id,
             ],
             [
-                'name' => 'Nikolas',
-                'email' => 'nikolasmosqr@gmail.com',
-                'password' => Hash::make('python123'),
-                'role' => 'estudiante',
-                'avatar' => '🧑‍🎓',
+                'name'      => 'Nikolas',
+                'email'     => 'nikolasmosqr@gmail.com',
+                'password'  => Hash::make('python123'),
+                'role'      => 'estudiante',
+                'avatar'    => '🧑‍🎓',
+                'parent_id' => $admin->id,
             ],
         ];
 

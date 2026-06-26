@@ -327,6 +327,7 @@ export default function AdminDashboard() {
             <PagoRapido
               saldo={billetera.saldo_pendiente}
               nombre={estudiante.nombre}
+              estudianteId={estudianteId}
               onPago={() => api.get(`/admin/dashboard?estudiante_id=${estudianteId}`).then(({ data }) => setData(data.data))}
             />
           )}
@@ -356,7 +357,7 @@ export default function AdminDashboard() {
   )
 }
 
-function PagoRapido({ saldo, nombre, onPago }) {
+function PagoRapido({ saldo, nombre, estudianteId, onPago }) {
   const [monto, setMonto]       = useState(String(saldo))
   const [enviando, setEnviando] = useState(false)
   const [ok, setOk]             = useState(false)
@@ -364,7 +365,7 @@ function PagoRapido({ saldo, nombre, onPago }) {
   async function handlePagar() {
     setEnviando(true)
     try {
-      await api.post('/admin/pagar', { monto: parseInt(monto) })
+      await api.post('/admin/pagar', { monto: parseInt(monto), estudiante_id: estudianteId })
       setOk(true)
       onPago()
     } finally {

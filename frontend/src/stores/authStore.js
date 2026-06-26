@@ -1,19 +1,21 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
-import api, { initCsrf, resetCsrf } from '@/lib/axios'
+import api from '@/lib/axios'
 
 export const useAuthStore = create(
   persist(
     (set, get) => ({
       user: null,
+      token: null,
       loading: false,
+      initialized: false,
 
       login: async (email, password) => {
         set({ loading: true })
         try {
-          await initCsrf()
           const { data } = await api.post('/auth/login', { email, password })
-          set({ user: data.data, loading: false })
+          api.defaults.headers.common['Authorization'] = `Bearer ${data.token}`
+          set({ user: data.data, token: data.token, loading: false })
           return { ok: true, role: data.data.role }
         } catch (err) {
           set({ loading: false })
@@ -25,17 +27,24 @@ export const useAuthStore = create(
         try {
           await api.post('/auth/logout')
         } finally {
-          resetCsrf()
-          set({ user: null })
+          delete api.defaults.headers.common['Authorization']
+          set({ user: null, token: null })
         }
       },
 
       fetchMe: async () => {
+        const token = get().token
+        if (!token) {
+          set({ initialized: true })
+          return
+        }
+        api.defaults.headers.common['Authorization'] = `Bearer ${token}`
         try {
           const { data } = await api.get('/auth/me')
-          set({ user: data.data })
+          set({ user: data.data, initialized: true })
         } catch {
-          set({ user: null })
+          delete api.defaults.headers.common['Authorization']
+          set({ user: null, token: null, initialized: true })
         }
       },
 
@@ -43,11 +52,11 @@ export const useAuthStore = create(
         set({ user: { ...get().user, ...userData } })
       },
 
-      isAdmin: () => get().user?.role === 'admin',
+      isAdmin: () => ['admin', 'superadmin'].includes(get().user?.role),
     }),
     {
       name: 'pythonjr-auth',
-      partialize: (s) => ({ user: s.user }),
+      partialize: (s) => ({ user: s.user, token: s.token }),
     }
   )
 )

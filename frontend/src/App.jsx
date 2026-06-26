@@ -24,25 +24,29 @@ function PageLoader() {
   )
 }
 
+const esRolAdmin = (role) => role === 'admin' || role === 'superadmin'
+
 function RequireAuth({ children, adminOnly = false }) {
   const user = useAuthStore((s) => s.user)
   if (!user) return <Navigate to="/login" replace />
-  if (adminOnly && user.role !== 'admin') return <Navigate to="/dashboard" replace />
-  // Admin no tiene acceso al área de estudiante
-  if (!adminOnly && user.role === 'admin') return <Navigate to="/admin/dashboard" replace />
+  if (adminOnly && !esRolAdmin(user.role)) return <Navigate to="/dashboard" replace />
+  if (!adminOnly && esRolAdmin(user.role)) return <Navigate to="/admin/dashboard" replace />
   return children
 }
 
 function RootRedirect() {
   const user = useAuthStore((s) => s.user)
   if (!user) return <Navigate to="/login" replace />
-  return <Navigate to={user.role === 'admin' ? '/admin/dashboard' : '/dashboard'} replace />
+  return <Navigate to={esRolAdmin(user.role) ? '/admin/dashboard' : '/dashboard'} replace />
 }
 
 export default function App() {
-  const fetchMe = useAuthStore((s) => s.fetchMe)
+  const fetchMe      = useAuthStore((s) => s.fetchMe)
+  const initialized  = useAuthStore((s) => s.initialized)
 
   useEffect(() => { fetchMe() }, [])
+
+  if (!initialized) return <PageLoader />
 
   return (
     <BrowserRouter>

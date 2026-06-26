@@ -26,21 +26,21 @@ export default function Login() {
       return
     }
 
-    const rolEsperado  = esAdmin ? 'admin' : 'estudiante'
-    const rolRecibido  = result.role
+    const rolRecibido   = result.role
+    const esRolAdmin    = (r) => r === 'admin' || r === 'superadmin'
 
-    if (rolRecibido !== rolEsperado) {
-      // El rol no coincide con el modo seleccionado — cerrar sesión y avisar
+    if (esAdmin && !esRolAdmin(rolRecibido)) {
       await logout()
-      setError(
-        rolRecibido === 'admin'
-          ? 'Esas credenciales son de administrador. Selecciona "Soy papá" para entrar.'
-          : 'Esas credenciales son de estudiante. Selecciona "Soy estudiante" para entrar.'
-      )
+      setError('Esas credenciales son de estudiante. Selecciona "Soy estudiante" para entrar.')
+      return
+    }
+    if (!esAdmin && esRolAdmin(rolRecibido)) {
+      await logout()
+      setError('Esas credenciales son de administrador. Selecciona "Soy papá" para entrar.')
       return
     }
 
-    navigate(rolRecibido === 'admin' ? '/admin/dashboard' : '/dashboard', { replace: true })
+    navigate(esRolAdmin(rolRecibido) ? '/admin/dashboard' : '/dashboard', { replace: true })
   }
 
   function cambiarModo(nuevoModo) {

@@ -32,6 +32,15 @@ else
     echo "Base de datos lista ($MODULO_COUNT módulos encontrados). Saltando seed."
 fi
 
+# ── Backfill: vincular estudiantes sin padre al primer superadmin ──────────
+php artisan tinker --execute="
+\$sup = App\Models\User::where('role', 'superadmin')->first();
+if (\$sup) {
+    \$n = App\Models\User::where('role', 'estudiante')->whereNull('parent_id')->update(['parent_id' => \$sup->id]);
+    if (\$n > 0) { echo \"Backfill: \$n estudiante(s) vinculados a superadmin.\"; }
+}
+" 2>/dev/null || true
+
 # ── Iniciar FrankenPHP ─────────────────────────────────────────────────────
 echo "Iniciando servidor en puerto ${PORT:-8080}..."
 exec frankenphp run --config /etc/caddy/Caddyfile --adapter caddyfile

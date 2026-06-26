@@ -15,7 +15,7 @@ class EsAdmin
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if (! $request->user()?->isAdmin()) {
+        if (! in_array($request->user()?->role, ['admin', 'superadmin'])) {
             return response()->json(['success' => false, 'message' => 'Acceso denegado.'], 403);
         }
 

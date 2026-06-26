@@ -18,12 +18,17 @@ class ValidacionController extends Controller
 
     public function pendientes(Request $request): JsonResponse
     {
-        $pendientes = EjercicioCompletado::where('validado_por_padre', false)
+        $query = EjercicioCompletado::where('validado_por_padre', false)
             ->where('es_correcto', false)
             ->whereHas('ejercicio', fn ($q) => $q->whereIn('tipo', ['codigo_libre', 'mini_proyecto']))
             ->with(['user', 'ejercicio.modulo'])
-            ->orderBy('completado_at')
-            ->get()
+            ->orderBy('completado_at');
+
+        if ($request->user()->role === 'admin') {
+            $query->whereHas('user', fn ($q) => $q->where('parent_id', $request->user()->id));
+        }
+
+        $pendientes = $query->get()
             ->map(fn ($ec) => [
                 'id' => $ec->id,
                 'estudiante' => $ec->user->name,
@@ -68,7 +73,7 @@ class ValidacionController extends Controller
 
             return response()->json([
                 'success' => true,
-                'message' => '✅ Ejercicio aprobado. ¡Santiago ganó $' . number_format($completado->recompensa_ganada, 0, ',', '.') . '!',
+                'message' => '✅ Ejercicio aprobado. ¡' . $completado->user->name . ' ganó $' . number_format($completado->recompensa_ganada, 0, ',', '.') . '!',
                 'meta' => [
                     'recompensa_ganada' => $completado->recompensa_ganada,
                     'nuevos_logros' => $gamificacion['nuevos_logros'],
@@ -90,10 +95,15 @@ class ValidacionController extends Controller
     public function pagar(Request $request): JsonResponse
     {
         $request->validate([
-            'monto' => 'required|integer|min:1000',
+            'monto'          => 'required|integer|min:1000',
+            'estudiante_id'  => 'required|integer|exists:users,id',
         ]);
 
-        $estudiante = \App\Models\User::where('role', 'estudiante')->firstOrFail();
+        $query = \App\Models\User::where('role', 'estudiante')->where('id', $request->integer('estudiante_id'));
+        if ($request->user()->role === 'admin') {
+            $query->where('parent_id', $request->user()->id);
+        }
+        $estudiante = $query->firstOrFail();
 
         $this->billeteraService->registrarPago($estudiante, $request->integer('monto'));
 
