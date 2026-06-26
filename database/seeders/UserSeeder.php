@@ -12,11 +12,22 @@ class UserSeeder extends Seeder
 {
     public function run(): void
     {
+        // Superadmin — dueño de la plataforma
+        User::create([
+            'name'      => 'James',
+            'email'     => 'jamesmosqr@gmail.com',
+            'password'  => Hash::make('superadmin123'),
+            'role'      => 'superadmin',
+            'avatar'    => '🦸',
+            'parent_id' => null,
+        ]);
+
+        // Admin — primer papá de prueba
         $admin = User::create([
             'name'      => 'Papá',
             'email'     => 'admin@pythonjr.com',
             'password'  => Hash::make('admin123'),
-            'role'      => 'superadmin',
+            'role'      => 'admin',
             'avatar'    => '👨‍💻',
             'parent_id' => null,
         ]);

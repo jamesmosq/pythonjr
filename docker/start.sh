@@ -32,12 +32,12 @@ else
     echo "Base de datos lista ($MODULO_COUNT módulos encontrados). Saltando seed."
 fi
 
-# ── Backfill: vincular estudiantes sin padre al primer superadmin ──────────
+# ── Backfill: vincular estudiantes huérfanos al primer admin de familia ────
 php artisan tinker --execute="
-\$sup = App\Models\User::where('role', 'superadmin')->first();
-if (\$sup) {
-    \$n = App\Models\User::where('role', 'estudiante')->whereNull('parent_id')->update(['parent_id' => \$sup->id]);
-    if (\$n > 0) { echo \"Backfill: \$n estudiante(s) vinculados a superadmin.\"; }
+\$admin = App\Models\User::where('role', 'admin')->first();
+if (\$admin) {
+    \$n = App\Models\User::where('role', 'estudiante')->whereNull('parent_id')->update(['parent_id' => \$admin->id]);
+    if (\$n > 0) { echo \"Backfill: \$n estudiante(s) vinculados al admin.\"; }
 }
 " 2>/dev/null || true
 
