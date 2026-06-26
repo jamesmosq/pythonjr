@@ -26,21 +26,25 @@ export default function Login() {
       return
     }
 
-    const rolRecibido   = result.role
-    const esRolAdmin    = (r) => r === 'admin' || r === 'superadmin'
+    const rolRecibido = result.role
 
-    if (esAdmin && !esRolAdmin(rolRecibido)) {
+    if (rolRecibido === 'superadmin') {
+      await logout()
+      setError('Tu cuenta es de administrador de plataforma. Usa el enlace privado de acceso.')
+      return
+    }
+    if (esAdmin && rolRecibido !== 'admin') {
       await logout()
       setError('Esas credenciales son de estudiante. Selecciona "Soy estudiante" para entrar.')
       return
     }
-    if (!esAdmin && esRolAdmin(rolRecibido)) {
+    if (!esAdmin && rolRecibido === 'admin') {
       await logout()
       setError('Esas credenciales son de administrador. Selecciona "Soy papá" para entrar.')
       return
     }
 
-    navigate(esRolAdmin(rolRecibido) ? '/admin/dashboard' : '/dashboard', { replace: true })
+    navigate(rolRecibido === 'admin' ? '/admin/dashboard' : '/dashboard', { replace: true })
   }
 
   function cambiarModo(nuevoModo) {

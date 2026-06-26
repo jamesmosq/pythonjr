@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\Admin\AdminDashboardController;
+use App\Http\Controllers\Api\SuperAdmin\SuperAdminController;
 use App\Http\Controllers\Api\Admin\AdminPerfilController;
 use App\Http\Controllers\Api\Admin\BonoSorpresaController;
 use App\Http\Controllers\Api\Admin\ConfiguracionController;
@@ -68,4 +69,12 @@ Route::middleware(['auth:sanctum', 'admin'])->prefix('admin')->group(function ()
     Route::get('/hackathon', [HackathonAdminController::class, 'index']);
     Route::post('/hackathon/activar', [HackathonAdminController::class, 'activar']);
     Route::delete('/hackathon/{hackathon}', [HackathonAdminController::class, 'cancelar']);
+});
+
+// Rutas del superadmin (dueño de la plataforma)
+Route::middleware(['auth:sanctum', 'superadmin'])->prefix('superadmin')->group(function () {
+    Route::get('/stats',                            [SuperAdminController::class, 'stats']);
+    Route::get('/familias',                         [SuperAdminController::class, 'familias']);
+    Route::get('/modulos',                          [SuperAdminController::class, 'modulos']);
+    Route::put('/modulos/{modulo}/toggle',          [SuperAdminController::class, 'toggleModulo']);
 });
