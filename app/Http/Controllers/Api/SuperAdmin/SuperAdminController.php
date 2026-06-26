@@ -6,6 +6,8 @@ use App\Models\Modulo;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 
 class SuperAdminController
 {
@@ -37,6 +39,7 @@ class SuperAdminController
                 'nombre'      => $admin->name,
                 'email'       => $admin->email,
                 'avatar'      => $admin->avatar,
+                'activo'      => (bool) $admin->activo,
                 'creado'      => $admin->created_at->format('d/m/Y'),
                 'estudiantes' => $admin->estudiantes->map(fn ($e) => [
                     'id'     => $e->id,
@@ -46,6 +49,44 @@ class SuperAdminController
             ]);
 
         return response()->json(['success' => true, 'data' => $familias]);
+    }
+
+    public function toggleFamilia(User $user): JsonResponse
+    {
+        if ($user->role !== 'admin') {
+            return response()->json(['success' => false, 'message' => 'Solo se pueden gestionar cuentas de familia.'], 422);
+        }
+
+        $user->activo = ! $user->activo;
+        $user->save();
+
+        // Revocar tokens de todos en la familia si se desactiva
+        if (! $user->activo) {
+            $user->tokens()->delete();
+            User::where('parent_id', $user->id)->each(fn ($e) => $e->tokens()->delete());
+        }
+
+        return response()->json([
+            'success' => true,
+            'data'    => ['activo' => (bool) $user->activo],
+        ]);
+    }
+
+    public function resetPasswordFamilia(User $user): JsonResponse
+    {
+        if ($user->role !== 'admin') {
+            return response()->json(['success' => false, 'message' => 'Solo se pueden resetear contraseñas de administradores de familia.'], 422);
+        }
+
+        $nueva = Str::random(4) . rand(10, 99) . Str::random(2);
+        $user->password = Hash::make($nueva);
+        $user->save();
+        $user->tokens()->delete();
+
+        return response()->json([
+            'success' => true,
+            'data'    => ['nueva_contrasena' => $nueva],
+        ]);
     }
 
     public function modulos(): JsonResponse

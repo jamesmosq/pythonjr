@@ -11,9 +11,28 @@ use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 
 class AdminDashboardController extends Controller
 {
+    public function resetPasswordEstudiante(User $estudiante, Request $request): JsonResponse
+    {
+        if ($estudiante->parent_id !== $request->user()->id) {
+            return response()->json(['success' => false, 'message' => 'No autorizado.'], 403);
+        }
+
+        $nueva = Str::random(4) . rand(10, 99) . Str::random(2);
+        $estudiante->password = Hash::make($nueva);
+        $estudiante->save();
+        $estudiante->tokens()->delete();
+
+        return response()->json([
+            'success' => true,
+            'data'    => ['nueva_contrasena' => $nueva],
+        ]);
+    }
+
     public function estudiantes(Request $request): JsonResponse
     {
         $query = User::where('role', 'estudiante')->orderBy('name');

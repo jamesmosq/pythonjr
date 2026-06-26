@@ -69,7 +69,18 @@ export default function AdminDashboard() {
   const [data, setData]                 = useState(null)
   const [estudiantes, setEstudiantes]   = useState([])
   const [estudianteId, setEstudianteId] = useState(null)
+  const [resetInfo,    setResetInfo]    = useState(null)  // { id, password }
+  const [resetting,    setResetting]    = useState(null)
   const navigate = useNavigate()
+
+  async function resetPasswordEstudiante(id) {
+    setResetting(id)
+    try {
+      const r = await api.post(`/admin/estudiantes/${id}/reset-password`)
+      setResetInfo({ id, password: r.data.data.nueva_contrasena })
+    } catch {}
+    setResetting(null)
+  }
 
   useEffect(() => {
     api.get('/admin/estudiantes').then(({ data }) => {
@@ -137,34 +148,60 @@ export default function AdminDashboard() {
 
       {/* Selector de estudiante (siempre visible cuando hay datos de lista) */}
       {estudiantes.length > 1 ? (
-        <div className="flex gap-2">
-          {estudiantes.map((est) => (
-            <button
-              key={est.id}
-              onClick={() => { setData(null); setEstudianteId(est.id) }}
-              className={`flex items-center gap-1.5 px-3 py-2 rounded-xl text-sm font-medium transition-all border ${
-                estudianteId === est.id
-                  ? 'bg-[#a3e635]/10 border-[#a3e635] text-[#a3e635]'
-                  : 'bg-[#161b22] border-[#30363d] text-[#8b949e] hover:border-[#484f58]'
-              }`}
-            >
-              <span>{est.avatar}</span>
-              <span>{est.nombre}</span>
-            </button>
-          ))}
+        <div className="space-y-2">
+          <div className="flex gap-2">
+            {estudiantes.map((est) => (
+              <button
+                key={est.id}
+                onClick={() => { setData(null); setEstudianteId(est.id); setResetInfo(null) }}
+                className={`flex items-center gap-1.5 px-3 py-2 rounded-xl text-sm font-medium transition-all border ${
+                  estudianteId === est.id
+                    ? 'bg-[#a3e635]/10 border-[#a3e635] text-[#a3e635]'
+                    : 'bg-[#161b22] border-[#30363d] text-[#8b949e] hover:border-[#484f58]'
+                }`}
+              >
+                <span>{est.avatar}</span>
+                <span>{est.nombre}</span>
+              </button>
+            ))}
+          </div>
+          {estudianteId && (
+            <ResetPasswordBtn
+              estudianteId={estudianteId}
+              resetting={resetting}
+              resetInfo={resetInfo}
+              onReset={resetPasswordEstudiante}
+              onClear={() => setResetInfo(null)}
+            />
+          )}
         </div>
       ) : estudiantes.length === 1 ? (
-        <div className="flex items-center gap-3 bg-[#161b22] border border-[#30363d] rounded-xl px-4 py-2.5">
-          <span className="text-2xl">{estudiantes[0].avatar}</span>
-          <div>
-            <div className="text-sm font-bold text-[#e6edf3]">{estudiantes[0].nombre}</div>
-            {data && (
-              <div className="text-[10px] text-[#8b949e]">
-                🔥 {racha.dias_actuales} días · máx {racha.dias_maximos}
-                {diasDesdeInicio > 0 && ` · ${diasDesdeInicio} días estudiando`}
+        <div className="space-y-2">
+          <div className="flex items-center justify-between gap-3 bg-[#161b22] border border-[#30363d] rounded-xl px-4 py-2.5">
+            <div className="flex items-center gap-3">
+              <span className="text-2xl">{estudiantes[0].avatar}</span>
+              <div>
+                <div className="text-sm font-bold text-[#e6edf3]">{estudiantes[0].nombre}</div>
+                {data && (
+                  <div className="text-[10px] text-[#8b949e]">
+                    🔥 {racha.dias_actuales} días · máx {racha.dias_maximos}
+                    {diasDesdeInicio > 0 && ` · ${diasDesdeInicio} días estudiando`}
+                  </div>
+                )}
               </div>
-            )}
+            </div>
+            <ResetPasswordBtn
+              estudianteId={estudiantes[0].id}
+              resetting={resetting}
+              resetInfo={resetInfo}
+              onReset={resetPasswordEstudiante}
+              onClear={() => setResetInfo(null)}
+              compact
+            />
           </div>
+          {resetInfo?.id === estudiantes[0].id && (
+            <PasswordReveal info={resetInfo} onClear={() => setResetInfo(null)} />
+          )}
         </div>
       ) : null}
 
@@ -353,6 +390,39 @@ export default function AdminDashboard() {
           </div>
         </>
       )}
+    </div>
+  )
+}
+
+function ResetPasswordBtn({ estudianteId, resetting, resetInfo, onReset, onClear, compact = false }) {
+  const loading = resetting === estudianteId
+  const done    = resetInfo?.id === estudianteId
+
+  if (done && !compact) {
+    return <PasswordReveal info={resetInfo} onClear={onClear} />
+  }
+
+  return (
+    <button
+      onClick={() => done ? onClear() : onReset(estudianteId)}
+      disabled={loading}
+      title="Resetear contraseña del estudiante"
+      className="flex items-center gap-1.5 bg-[#21262d] border border-[#30363d] rounded-lg px-2.5 py-1.5 text-xs text-[#8b949e] hover:text-[#e6edf3] hover:border-[#a3e635] transition-all disabled:opacity-50 flex-shrink-0"
+    >
+      🔑 {loading ? '...' : done ? 'Ver contraseña' : 'Reset hijo'}
+    </button>
+  )
+}
+
+function PasswordReveal({ info, onClear }) {
+  return (
+    <div className="bg-[#a3e635]/10 border border-[#a3e635]/30 rounded-xl px-4 py-3 flex items-center justify-between gap-3">
+      <div>
+        <div className="text-xs text-[#8b949e] mb-0.5">Nueva contraseña temporal:</div>
+        <div className="font-mono font-black text-[#a3e635] text-lg tracking-widest">{info.password}</div>
+        <div className="text-xs text-[#484f58] mt-0.5">Dásela a tu hijo para que inicie sesión.</div>
+      </div>
+      <button onClick={onClear} className="text-[#484f58] hover:text-[#8b949e] text-xl flex-shrink-0">✕</button>
     </div>
   )
 }

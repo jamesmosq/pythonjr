@@ -55,6 +55,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
 Route::middleware(['auth:sanctum', 'admin'])->prefix('admin')->group(function () {
     Route::get('/dashboard', [AdminDashboardController::class, 'index']);
     Route::get('/estudiantes', [AdminDashboardController::class, 'estudiantes']);
+    Route::post('/estudiantes/{estudiante}/reset-password', [AdminDashboardController::class, 'resetPasswordEstudiante']);
     Route::put('/perfil', [AdminPerfilController::class, 'update']);
     Route::get('/pendientes', [ValidacionController::class, 'pendientes']);
     Route::post('/validar/{completado}', [ValidacionController::class, 'validar']);
@@ -73,8 +74,10 @@ Route::middleware(['auth:sanctum', 'admin'])->prefix('admin')->group(function ()
 
 // Rutas del superadmin (dueño de la plataforma)
 Route::middleware(['auth:sanctum', 'superadmin'])->prefix('superadmin')->group(function () {
-    Route::get('/stats',                            [SuperAdminController::class, 'stats']);
-    Route::get('/familias',                         [SuperAdminController::class, 'familias']);
-    Route::get('/modulos',                          [SuperAdminController::class, 'modulos']);
-    Route::put('/modulos/{modulo}/toggle',          [SuperAdminController::class, 'toggleModulo']);
+    Route::get('/stats',                             [SuperAdminController::class, 'stats']);
+    Route::get('/familias',                          [SuperAdminController::class, 'familias']);
+    Route::put('/familias/{user}/toggle',            [SuperAdminController::class, 'toggleFamilia']);
+    Route::post('/familias/{user}/reset-password',   [SuperAdminController::class, 'resetPasswordFamilia']);
+    Route::get('/modulos',                           [SuperAdminController::class, 'modulos']);
+    Route::put('/modulos/{modulo}/toggle',           [SuperAdminController::class, 'toggleModulo']);
 });

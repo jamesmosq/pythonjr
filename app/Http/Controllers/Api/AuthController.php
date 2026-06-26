@@ -108,6 +108,21 @@ class AuthController extends Controller
             ]);
         }
 
+        if (! $user->activo) {
+            throw ValidationException::withMessages([
+                'email' => ['Tu cuenta ha sido desactivada. Contacta al administrador.'],
+            ]);
+        }
+
+        if ($user->role === 'estudiante' && $user->parent_id) {
+            $padre = User::find($user->parent_id);
+            if ($padre && ! $padre->activo) {
+                throw ValidationException::withMessages([
+                    'email' => ['La cuenta de tu familia está desactivada. Contacta al administrador.'],
+                ]);
+            }
+        }
+
         // Revocar tokens previos y emitir uno nuevo
         $user->tokens()->delete();
         $token = $user->createToken('spa')->plainTextToken;
