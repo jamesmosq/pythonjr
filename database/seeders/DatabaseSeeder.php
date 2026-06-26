@@ -22,6 +22,8 @@ class DatabaseSeeder extends Seeder
             Modulo8Seeder::class,
             Modulo9Seeder::class,
             ModuloBDSeeder::class,
+            ModuloHTMLSeeder::class,
+            ModuloCSSSeeder::class,
             LogroSeeder::class,
             ProgresoSeeder::class,
             ConfiguracionSeeder::class,

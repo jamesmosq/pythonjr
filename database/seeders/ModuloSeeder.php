@@ -86,6 +86,19 @@ class ModuloSeeder extends Seeder
                 'descripcion' => 'Tú eliges el problema, tú lo resuelves. Demuestra todo lo que aprendiste.',
                 'icono' => '🏆', 'dias_estimados' => 14, 'recompensa_base' => 80000, 'activo' => true,
             ],
+            // Nivel 5 — Web
+            [
+                'nivel' => 5, 'orden' => 1, 'slug' => 'html-construyendo-la-web',
+                'titulo' => 'HTML: Construyendo la Web',
+                'descripcion' => 'El lenguaje que da estructura a todas las páginas web. Crea tu primera página desde cero.',
+                'icono' => '🌐', 'dias_estimados' => 7, 'recompensa_base' => 5000, 'activo' => true,
+            ],
+            [
+                'nivel' => 5, 'orden' => 2, 'slug' => 'css-disenando-con-estilo',
+                'titulo' => 'CSS: Diseñando con Estilo',
+                'descripcion' => 'Dales vida y color a tus páginas HTML. Colores, tipografías, flexbox y más.',
+                'icono' => '🎨', 'dias_estimados' => 7, 'recompensa_base' => 5000, 'activo' => true,
+            ],
         ];
 
         foreach ($modulos as $data) {
