@@ -15,6 +15,7 @@ const Validaciones = lazy(() => import('@/pages/admin/Validaciones'))
 const ConfiguracionAdmin = lazy(() => import('@/pages/admin/ConfiguracionAdmin'))
 const ActivarHackathon = lazy(() => import('@/pages/admin/ActivarHackathon'))
 const Hackathon = lazy(() => import('@/pages/Hackathon'))
+const SuperAdminLogin = lazy(() => import('@/pages/SuperAdminLogin'))
 
 function PageLoader() {
   return (
@@ -53,6 +54,7 @@ export default function App() {
       <Suspense fallback={<PageLoader />}>
         <Routes>
           <Route path="/login" element={<Login />} />
+          <Route path="/acceso" element={<SuperAdminLogin />} />
           <Route path="/registro/:token" element={<Register />} />
 
           <Route element={<RequireAuth><AppLayout /></RequireAuth>}>
